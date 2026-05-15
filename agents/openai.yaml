@@ -1,0 +1,4 @@
+﻿interface:
+  display_name: "Codex 和 Claude Code 多智能体协作"
+  short_description: "通过 thread、signal、分工确认和 closing 机制协调 Codex 与 Claude Code。"
+  default_prompt: "和 Claude Code 协作完成："

@@ -1,0 +1,14 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .ai-collab/wait-cycle.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
