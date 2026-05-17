@@ -2,7 +2,7 @@
 
 通过共享文件系统，让 Codex 和 Claude Code 在同一个项目里低成本协作。
 
-这个仓库主要是一个 Codex skill 包，同时也包含 Claude Code 端需要复制到目标项目的 hook 配置和轮询脚本。核心协议放在 `SKILL.md`，更详细的协作模板和 Claude Code 端配置放在 `references/`。它适合在用户希望“Codex 和 Claude Code 协作完成某个软件任务”时使用。
+这个仓库是一个给 Codex 和 Claude Code 共同使用的协作 skill 包，同时也包含 Claude Code 端需要复制到目标项目的 hook 配置和轮询脚本。核心协议放在 `SKILL.md`，更详细的协作模板和 Claude Code 端配置放在 `references/`。它适合在用户希望“Codex 和 Claude Code 协作完成某个软件任务”时使用。
 
 ## 解决什么问题
 
@@ -31,12 +31,13 @@ Codex 和 Claude Code 通常运行在不同会话里，直接靠用户来回复�
 
 ## 需要装在哪里
 
-要真正跑起来，需要同时完成两边配置：
+推荐同时装到 Codex 和 Claude Code 的 skill 目录里，并让两边读同一套协议：
 
-1. Codex 侧：把本目录作为 Codex skill 安装或注册，让 Codex 知道协作协议。
-2. Claude Code 侧：不需要安装这个 Codex skill，但需要把 `scripts/wait-cycle.sh` 和 hook 配置接入目标项目，让 Claude Code 能读取同一个 `.ai-collab/` 协作目录。
+1. Codex 侧：把本目录作为 Codex skill 安装或注册，让 Codex 知道如何创建 thread、写 signal、等待 Claude、kickoff 和 closing。
+2. Claude Code 侧：把同一个 skill 安装或注册到 Claude Code 可读取的 skill 位置，让 Claude Code 知道同一套 thread/signal 协议、round 格式和分工规则。
+3. 目标项目侧：复制 `scripts/wait-cycle.sh` 和 Claude Code hook 配置，让 Claude Code 能发现 Codex 写入的 signal，并读写同一个 `.ai-collab/` 协作目录。
 
-换句话说：协议文档和决策规则主要给 Codex 用；Claude Code 侧靠项目里的 `.claude/settings.local.json`、`.ai-collab/wait-cycle.sh` 和共享文件来参与协作。
+换句话说：skill 应该两边都装，用来统一“怎么协作”；hook/script 是 Claude Code 侧额外需要的唤醒和轮询机制，用来解决“怎么知道对方发了新 round”。
 
 ## 快速使用
 
@@ -102,11 +103,11 @@ Windows Git Bash 中，`D:\claude_code` 通常写作 `/d/claude_code`。
 - 不要实现已经明确分给对方的工作；需要调整分工时先追加 coordination round。
 - 完成时不能只告诉用户，还要追加 closing round 并 signal 对方。
 
-## 安装到 Codex
+## 安装 Skill
 
-把本目录作为 skill 放到 Codex skills 目录中，或按你的 Codex 本地插件/skill 管理方式注册。注册后，当用户提到 “和 Claude Code 协作完成” 或类似需求时，Codex 会读取 `SKILL.md` 中的协议并执行。
+把本目录作为 skill 分别放到 Codex 和 Claude Code 的 skills 目录中，或按各自的本地 skill 管理方式注册。注册后，当用户提到 “和 Claude Code 协作完成” 或类似需求时，双方都能读取 `SKILL.md` 中的协议并按同一套规则协作。
 
-这一步只覆盖 Codex。Claude Code 仍然需要在每个要协作的目标项目里配置 hook 或 cron，否则 Claude Code 不会自动发现 Codex 写入的 signal。
+安装 skill 只解决协议理解。Claude Code 仍然需要在每个要协作的目标项目里配置 hook 或 cron，否则它不会自动发现 Codex 写入的 signal。
 
 ## 注意
 
